@@ -6,7 +6,7 @@ const USERS_URL =
 
 const contactsField = document.querySelector(".contacts-field");
 const optionsMenu = document.querySelector(".options");
-
+const searchInput = document.querySelector(".options__search__inpit");
 let originalContacts;
 let contacts;
 let filter = "";
@@ -47,15 +47,25 @@ function renderContactTemplate(contact) {
           </div>`;
 }
 
+optionsMenu.addEventListener("click", onOptionsClick);
+searchInput.addEventListener("change", onChangeSearch);
+
+function onChangeSearch() {
+  contacts = contacts.filter((element) => {
+    return element.name.first
+      .toLowerCase()
+      .includes(searchInput.value.toLowerCase());
+  });
+  renderContacts(contacts);
+}
+
 function renderContacts(contacts) {
   contactsField.innerHTML = contacts
     .map((contact) => renderContactTemplate(contact))
     .join("");
 }
-optionsMenu.addEventListener("click", onOptionsClick);
 
 function onOptionsClick(e) {
-  const searchInput = document.querySelector(".options__search__inpit");
   const selectedOption = e.target.classList.value;
 
   switch (selectedOption) {
@@ -94,17 +104,19 @@ function onOptionsClick(e) {
     case "options__blocks__reset-btn":
       resetOptions();
       break;
-    case "options__search__icon":
-      renderContacts(searchName(searchInput));
-      break;
+    // case "options__search__icon":
+    //   renderContacts(searchName(searchInput));
+    //   break;
     default:
       break;
   }
 }
+
 function resetOptions() {
   copyData();
   filter = "";
   searchInput.value = "";
+  console.log(contacts);
   renderContacts(contacts);
 }
 
@@ -127,19 +139,20 @@ function filterGender(contacts, gender) {
   return contacts.filter((element) => element.gender == gender);
 }
 
-function searchName(input) {
-  if (input.value)
-    return originalContacts.filter(
-      (element) => element.name.first == input.value
-    );
-}
+// function searchName(input) {
+//   if (input.value)
+//     return originalContacts.filter(
+//       (element) => element.name.first == input.value
+//     );
+// }
 
 function sortWithFilter(contacts, gender) {
   if (gender == "") return contacts;
   else return filterGender(contacts, gender);
 }
 function copyData() {
-  contacts = originalContacts.map((a) => ({ ...a }));
+  // contacts = originalContacts.map((a) => ({ ...a }));
+  contacts = originalContacts.slice(0, originalContacts.length);
 }
 function init() {
   getContacts(USERS_URL);
